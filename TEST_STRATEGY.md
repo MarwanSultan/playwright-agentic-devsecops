@@ -22,6 +22,14 @@ Fixtures own setup and teardown. The `homePage` fixture launches the configured 
 
 The eventual inventory target is approximately 200 meaningful tests: about 80 UI, 50 API/contract, 20 network, 20 data-driven, 20 negative/boundary/edge, and 10 integration scenarios. Counts are planning limits, not a reason to duplicate assertions. Accessibility checks are attached to suitable UI flows. Authentication is added only with an approved test identity and secret strategy.
 
+The current critical baseline contains exactly five tests per primary automation category:
+
+- **UI:** homepage availability, primary navigation, primary heading, main-content landmark, and navigable primary links;
+- **API:** homepage response, robots policy, sitemap document, unknown-path error behavior, and homepage content/transport contract;
+- **Network:** mocked response fulfillment, aborted dependency, continued request modification, simulated backend error, and response status/content-type inspection.
+
+These scenarios prioritize application availability, navigation, public contract integrity, and dependency-failure behavior. They are safe for public read-only execution and form the minimum smoke/regression baseline before broader expansion.
+
 ## Determinism rules
 
 - no arbitrary sleeps;

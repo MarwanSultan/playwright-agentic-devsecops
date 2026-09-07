@@ -73,7 +73,7 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     apiBaseUrl,
     environment: parseEnvironment(env.ENVIRONMENT, isCi),
     isCi,
-    headless: parseBoolean(env.HEADLESS, isCi),
+    headless: parseBoolean(env.HEADLESS, true),
     workers: parsePositiveInteger('WORKERS', env.WORKERS),
     retries: parsePositiveInteger('RETRIES', env.RETRIES) ?? (isCi ? 2 : 0),
     timeout: parsePositiveInteger('TIMEOUT', env.TIMEOUT) ?? 30_000,

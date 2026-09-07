@@ -9,7 +9,7 @@ describe('loadRuntimeConfig', () => {
     expect(config.baseUrl).toBe('https://www.va.gov');
     expect(config.apiBaseUrl).toBe('https://www.va.gov');
     expect(config.environment).toBe('local');
-    expect(config.headless).toBe(false);
+    expect(config.headless).toBe(true);
     expect(config.retries).toBe(0);
   });
 

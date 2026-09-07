@@ -4,11 +4,13 @@ export class HomePage {
   readonly page: Page;
   readonly primaryNavigation;
   readonly headings;
+  readonly mainContent;
 
   constructor(page: Page) {
     this.page = page;
     this.primaryNavigation = page.getByRole('navigation').first();
     this.headings = page.getByRole('heading');
+    this.mainContent = page.getByRole('main');
   }
 
   async title(): Promise<string> {

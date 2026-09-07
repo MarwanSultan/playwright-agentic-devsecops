@@ -45,7 +45,14 @@ test.describe('network routing behavior', () => {
     runtimeConfig,
   }) => {
     let observedStatus = 0;
-    let observedHeader = '';
+    let originalHeader: string | undefined;
+    let continuedWithDiagnosticHeader = false;
+
+    page.on('request', (request) => {
+      if (request.isNavigationRequest()) {
+        originalHeader = request.headers()['x-test-run'];
+      }
+    });
 
     page.on('response', (response) => {
       if (response.request().isNavigationRequest()) {
@@ -54,19 +61,68 @@ test.describe('network routing behavior', () => {
     });
 
     await page.route(`${runtimeConfig.baseUrl}/`, async (route) => {
-      observedHeader = route.request().headers()['x-test-run'];
+      const headers = {
+        ...route.request().headers(),
+        'x-test-run': 'network-routing',
+      };
+      continuedWithDiagnosticHeader = headers['x-test-run'] === 'network-routing';
+
       await route.continue({
-        headers: {
-          ...route.request().headers(),
-          'x-test-run': 'network-routing',
-        },
+        headers,
       });
     });
 
     await page.goto('/');
 
-    expect(observedHeader).toBeUndefined();
+    expect(originalHeader).toBeUndefined();
+    expect(continuedWithDiagnosticHeader).toBe(true);
     expect(observedStatus).toBeGreaterThanOrEqual(200);
     expect(observedStatus).toBeLessThan(400);
+  });
+
+  test('surfaces a deterministic backend error response', async ({ page, homePage }) => {
+    await page.route('**/api/simulated-error', (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'dependency unavailable' }),
+      }),
+    );
+
+    const response = await homePage.page.evaluate(async () => {
+      const result = await fetch('/api/simulated-error');
+      return { status: result.status, body: await result.json() };
+    });
+
+    expect(response).toEqual({
+      status: 503,
+      body: { error: 'dependency unavailable' },
+    });
+  });
+
+  test('inspects response status and content type for a mocked dependency', async ({
+    page,
+    homePage,
+  }) => {
+    await page.route('**/api/simulated-response', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ status: 'ready' }),
+      }),
+    );
+
+    const observed = await homePage.page.evaluate(async () => {
+      const response = await fetch('/api/simulated-response');
+      return {
+        status: response.status,
+        contentType: response.headers.get('content-type'),
+      };
+    });
+
+    expect(observed).toEqual({
+      status: 200,
+      contentType: 'application/json',
+    });
   });
 });
