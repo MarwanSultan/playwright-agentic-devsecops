@@ -1,0 +1,49 @@
+{
+  "name": "playwright-agentic-devsecops",
+  "version": "1.0.0",
+  "description": "Production-oriented Playwright test automation framework for public VA.gov behavior.",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test tests/ui",
+    "test:api": "playwright test tests/api",
+    "test:network": "playwright test tests/network",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "report": "playwright show-report",
+    "install:browsers": "playwright install --with-deps",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.5.0",
+    "@typescript-eslint/eslint-plugin": "8.69.0",
+    "@typescript-eslint/parser": "8.69.0",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "husky": "9.1.7",
+    "lint-staged": "16.1.6",
+    "prettier": "3.9.6",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.69.0",
+    "vitest": "3.2.7"
+  },
+  "lint-staged": {
+    "*.{ts,mts,cts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

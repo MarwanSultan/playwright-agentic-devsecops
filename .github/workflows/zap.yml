@@ -1,0 +1,33 @@
+name: Authorized ZAP Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Authorized local/test URL only (for example http://localhost:3000)'
+        required: true
+        default: 'http://localhost:3000'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    name: Run authorized baseline scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate target scope
+        env:
+          TARGET_URL: ${{ inputs.target_url }}
+        run: |
+          case "$TARGET_URL" in
+            http://localhost:*|http://127.0.0.1:*) ;;
+            *) echo 'Only explicitly authorized local targets are allowed.' >&2; exit 1 ;;
+          esac
+      - name: Run OWASP ZAP baseline
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ inputs.target_url }}
+          fail_action: true
+          allow_issue_writing: false

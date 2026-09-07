@@ -1,0 +1,15 @@
+node_modules
+.git
+.github
+.env
+.env.*
+!.env.example
+playwright-report
+test-results
+playwright/.cache
+README.md
+ARCHITECTURE.md
+CI_CD.md
+SECURITY.md
+TEST_PLAN.md
+TEST_STRATEGY.md
