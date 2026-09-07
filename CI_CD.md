@@ -11,7 +11,7 @@ The main workflow runs on every push and pull request:
 5. build the Docker image and run a Chromium smoke test;
 6. retain test diagnostics and JUnit output.
 
-The CodeQL workflow analyzes JavaScript/TypeScript on pushes, pull requests, and weekly schedule. Dependabot updates npm and GitHub Actions manifests.
+The CodeQL workflow analyzes JavaScript/TypeScript on pushes, pull requests, and weekly schedule. Dependabot updates npm, GitHub Actions, and Docker manifests. CodeQL runs on GitHub-hosted runners; local `act` requires a valid GitHub token to pre-fetch the public CodeQL action and cannot reproduce GitHub's security-events upload. Do not use a fake token: run CodeQL in GitHub Actions or provide a locally authorized token through `act` without committing it.
 
 ## Reliability and speed
 

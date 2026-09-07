@@ -23,5 +23,8 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
+          token: ${{ github.token }}
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          token: ${{ github.token }}

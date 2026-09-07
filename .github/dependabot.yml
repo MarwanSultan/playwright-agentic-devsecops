@@ -1,15 +1,79 @@
 version: 2
+
 updates:
-  - package-ecosystem: npm
-    directory: /
+  # ============================================================
+  # NPM / Node.js Dependencies
+  # ============================================================
+  - package-ecosystem: 'npm'
+    directory: '/'
+
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
-  - package-ecosystem: github-actions
-    directory: /
+      interval: 'weekly'
+      day: 'monday'
+      time: '03:00'
+      timezone: 'America/New_York'
+
+    # Group dependency updates into a single PR
+    groups:
+      npm-dependencies:
+        patterns:
+          - '*'
+
+    # Give newly released packages time to stabilize
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+
+    open-pull-requests-limit: 10
+
+  # ============================================================
+  # GitHub Actions
+  # ============================================================
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+
     schedule:
-      interval: monthly
-  - package-ecosystem: docker
-    directory: /
+      interval: 'weekly'
+      day: 'tuesday'
+      time: '03:00'
+      timezone: 'America/New_York'
+
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+
+    open-pull-requests-limit: 10
+
+  # ============================================================
+  # Docker
+  # ============================================================
+  - package-ecosystem: 'docker'
+    directory: '/'
+
     schedule:
-      interval: monthly
+      interval: 'weekly'
+      day: 'wednesday'
+      time: '03:00'
+      timezone: 'America/New_York'
+
+    groups:
+      docker-dependencies:
+        patterns:
+          - '*'
+
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+
+    open-pull-requests-limit: 10
