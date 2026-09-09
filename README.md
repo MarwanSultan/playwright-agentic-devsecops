@@ -56,6 +56,8 @@ The included tests do **not** submit claims, modify user accounts, delete resour
 
 LangGraph, LangChain, Deep Agents, and MCP are not runtime dependencies. The deterministic framework remains fully functional if AI services are unavailable.
 
+The optional TypeScript failure-investigation layer is scaffolded under `agentic/investigator/`. It uses typed LangGraph state, an injectable analysis model, an optional Playwright MCP client, and OpenTelemetry spans. It is advisory only and is not invoked by `npm test`.
+
 ## Repository structure
 
 ```text
@@ -151,18 +153,21 @@ Invalid URLs, booleans, integers, environments, and shard combinations fail clos
 
 ## Running tests
 
-| Command                | Purpose                                |
-| ---------------------- | -------------------------------------- |
-| `npm test`             | Run all Playwright projects            |
-| `npm run test:ui`      | Run UI tests                           |
-| `npm run test:api`     | Run API tests                          |
-| `npm run test:network` | Run network tests                      |
-| `npm run test:unit`    | Run Vitest unit tests                  |
-| `npm run typecheck`    | Run strict TypeScript compilation      |
-| `npm run lint`         | Run ESLint                             |
-| `npm run format:check` | Verify Prettier formatting             |
-| `npm run format`       | Format supported repository files      |
-| `npm run report`       | Open the latest Playwright HTML report |
+| Command                                   | Purpose                                |
+| ----------------------------------------- | -------------------------------------- |
+| `npm test`                                | Run all Playwright projects            |
+| `npm run test:ui`                         | Run UI tests                           |
+| `npm run test:api`                        | Run API tests                          |
+| `npm run test:network`                    | Run network tests                      |
+| `npm run test:unit`                       | Run Vitest unit tests                  |
+| `npm run typecheck`                       | Run strict TypeScript compilation      |
+| `npm run lint`                            | Run ESLint                             |
+| `npm run format:check`                    | Verify Prettier formatting             |
+| `npm run ci:local`                        | Run the complete local quality gate    |
+| `npm run test:agent`                      | Run investigator graph/config tests    |
+| `npm run agent:config -- validate-config` | Validate optional agent configuration  |
+| `npm run format`                          | Format supported repository files      |
+| `npm run report`                          | Open the latest Playwright HTML report |
 
 Run one browser project with Playwright's project option:
 
@@ -200,6 +205,24 @@ API tests use `apiTest` from `fixtures/api.ts`. It creates an isolated `APIReque
 ### Isolation and mocking
 
 Each Playwright test receives its own context. Network routes are scoped to individual tests; API and UI tests do not share mutable state. Real public read-only behavior is preferred for confidence. `route.fulfill`, `route.continue`, and `route.abort` are used for deterministic failure simulation, unavailable dependencies, and safe request/response validation—not indiscriminately across the suite.
+
+## Optional agentic investigation layer
+
+The first agentic milestone investigates failed Playwright evidence; it does not execute normal tests, change source code, push Git branches, or turn a failed test into a pass.
+
+```mermaid
+flowchart TD
+  A[Playwright test result] --> B[Evidence and artifacts]
+  B --> C[Typed LangGraph state]
+  C --> D[Classification and diagnosis]
+  C -. optional read-only .-> E[Playwright MCP]
+  E -. snapshots/screenshots .-> D
+  D --> F[JSON and Markdown advisory report]
+```
+
+The graph defaults to deterministic classification and can run without an LLM. Local model integration is configured with Ollama and a Llama model. A future vLLM deployment can use the same provider boundary through an OpenAI-compatible endpoint. MCP is opt-in through `PLAYWRIGHT_MCP_COMMAND` and `PLAYWRIGHT_MCP_ARGS`; credentials and endpoints are never hard-coded.
+
+Run the current agent checks with `npm run test:agent`. Validate configuration with `npm run agent:config -- validate-config` after copying `.env.example`. Real Ollama and Playwright MCP execution requires an explicitly authorized local/test environment and is not part of the standard CI or Playwright test command.
 
 ## Docker
 
@@ -342,7 +365,9 @@ Use the provided Dockerfile and runtime directories. The image creates `test-res
 6. Run the fast quality gate before committing.
 7. Inspect the diff and generated artifacts before opening a pull request.
 
-Husky runs `lint-staged` on commit for staged TypeScript, JSON, Markdown, and workflow files. The pre-push hook runs the TypeScript check. Full browser, Docker, security, and cross-browser validation belongs in CI rather than in the pre-commit hook.
+Husky runs `lint-staged` and then the complete deterministic local quality gate on every commit. The pre-push hook repeats that gate before code can be pushed. `npm run ci:local` runs formatting, ESLint, strict TypeScript, unit tests, npm audit, and the complete Playwright browser matrix. This is intentionally thorough and may take several minutes.
+
+Every pull request is validated by GitHub Actions through `.github/workflows/playwright.yml`. Hosted-only controls—CodeQL, Trivy, Dependency Review, optional Snyk, and the authorized ZAP workflow—remain in GitHub Actions because they require hosted services, container capabilities, or repository security context that local Git hooks cannot faithfully provide.
 
 ## Roadmap
 

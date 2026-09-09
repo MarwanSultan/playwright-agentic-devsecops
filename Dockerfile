@@ -1,29 +1,27 @@
-FROM node:22.14.0-bookworm-slim AS dependencies
+# syntax=docker/dockerfile:1
 
-WORKDIR /work
-COPY package.json package-lock.json ./
+FROM mcr.microsoft.com/playwright:v1.55.0-noble
+
+WORKDIR /app
+
+# Install dependencies first for better Docker layer caching
+COPY package*.json ./
+
 RUN npm ci
 
-FROM mcr.microsoft.com/playwright:v1.63.0-noble AS runner
+# Copy project source
+COPY . .
 
-ENV NODE_ENV=production \
-    CI=true \
-    HEADLESS=true
-WORKDIR /work
-
-COPY --from=dependencies /work/node_modules ./node_modules
-COPY --chown=pwuser:pwuser package.json package-lock.json tsconfig.json playwright.config.ts vitest.config.ts .prettierrc.json ./
-COPY --chown=pwuser:pwuser api ./api
-COPY --chown=pwuser:pwuser config ./config
-COPY --chown=pwuser:pwuser data ./data
-COPY --chown=pwuser:pwuser fixtures ./fixtures
-COPY --chown=pwuser:pwuser pages ./pages
-COPY --chown=pwuser:pwuser tests ./tests
-COPY --chown=pwuser:pwuser types ./types
-COPY --chown=pwuser:pwuser unit ./unit
-COPY --chown=pwuser:pwuser utils ./utils
-RUN mkdir -p /work/test-results /work/playwright-report \
-    && chown -R pwuser:pwuser /work
-
+# Do not run as root during normal execution
+RUN chown -R pwuser:pwuser /app
 USER pwuser
-CMD ["npm", "test", "--", "--project=chromium"]
+
+# Default environment
+ENV CI=true \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+# Validate the TypeScript project during image build
+RUN npx tsc --noEmit
+
+# Default command
+CMD ["npx", "playwright", "test"]
