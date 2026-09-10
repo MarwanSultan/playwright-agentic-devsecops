@@ -43,7 +43,16 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Skip Snyk when token is not configured
+        if: ${{ env.SNYK_TOKEN == '' }}
+        run: echo "SNYK_TOKEN secret is not configured; skipping Snyk scan."
       - name: Run Snyk dependency scan
+        if: ${{ env.SNYK_TOKEN != '' }}
         uses: snyk/actions/node@v1.0.0
         with:
           args: --severity-threshold=high
+      - name: Monitor project with Snyk
+        if: ${{ env.SNYK_TOKEN != '' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        uses: snyk/actions/node@v1.0.0
+        with:
+          command: monitor
