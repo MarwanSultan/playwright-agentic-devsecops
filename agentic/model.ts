@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { ChatOpenAI } from '@langchain/openai';
 
 const apiKey = process.env.OPENAI_API_KEY;

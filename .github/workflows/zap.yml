@@ -12,19 +12,29 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: zap-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   zap:
     name: Run authorized baseline scan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Validate target scope
         env:
           TARGET_URL: ${{ inputs.target_url }}
         run: |
           case "$TARGET_URL" in
-            http://localhost:*|http://127.0.0.1:*) ;;
-            *) echo 'Only explicitly authorized local targets are allowed.' >&2; exit 1 ;;
+            http://localhost:[0-9]*|http://127.0.0.1:[0-9]*) ;;
+            *)
+              echo "::error::Only explicitly authorized localhost or 127.0.0.1 targets with a port are allowed."
+              exit 1
+              ;;
           esac
+
       - name: Run OWASP ZAP baseline
         uses: zaproxy/action-baseline@v0.14.0
         with:
