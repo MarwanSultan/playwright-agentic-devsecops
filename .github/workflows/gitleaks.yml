@@ -1,0 +1,33 @@
+name: Secret Scanning
+
+on:
+  push:
+    branches: [main, master]
+
+  pull_request:
+    branches: [main, master]
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gitleaks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    name: Gitleaks Secret Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan repository with Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
