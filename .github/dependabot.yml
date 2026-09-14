@@ -13,13 +13,13 @@ updates:
       time: '03:00'
       timezone: 'America/New_York'
 
-    # Group dependency updates into a single PR
+    # Group routine dependency updates to reduce PR noise.
     groups:
       npm-dependencies:
         patterns:
           - '*'
 
-    # Give newly released packages time to stabilize
+    # Allow newly released dependencies time to stabilize.
     cooldown:
       default-days: 3
       semver-major-days: 14
@@ -40,11 +40,13 @@ updates:
       time: '03:00'
       timezone: 'America/New_York'
 
+    # Group routine GitHub Actions updates to reduce PR noise.
     groups:
       github-actions:
         patterns:
           - '*'
 
+    # Allow newly released Actions time to stabilize.
     cooldown:
       default-days: 3
       semver-major-days: 14
@@ -65,11 +67,13 @@ updates:
       time: '03:00'
       timezone: 'America/New_York'
 
+    # Group Docker dependency updates to reduce PR noise.
     groups:
       docker-dependencies:
         patterns:
           - '*'
 
+    # Allow newly released images time to stabilize.
     cooldown:
       default-days: 3
       semver-major-days: 14
