@@ -22,13 +22,14 @@ jobs:
   quality:
     name: Static quality and unit tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -53,7 +54,7 @@ jobs:
 
       - name: Upload unit results
         if: ${{ !cancelled() && !env.ACT }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: unit-results
           path: test-results/unit-junit.xml
@@ -64,6 +65,7 @@ jobs:
     name: ${{ matrix.project }} shard ${{ matrix.shard }}/2
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -74,10 +76,10 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -96,7 +98,7 @@ jobs:
 
       - name: Upload browser diagnostics
         if: ${{ !cancelled() && !env.ACT }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-${{ matrix.project }}-shard-${{ matrix.shard }}
           path: |
@@ -109,10 +111,11 @@ jobs:
     name: Container smoke test
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Build test image
         run: docker build --tag va-automation:test .

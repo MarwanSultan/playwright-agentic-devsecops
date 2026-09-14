@@ -1,0 +1,20 @@
+# Default owner for the repository
+* @MarwanSultan
+
+# CI/CD and security configuration
+.github/ @MarwanSultan
+.github/workflows/ @MarwanSultan
+
+# Core automation and agentic AI code
+agentic/ @MarwanSultan
+ai/ @MarwanSultan
+chatbot/ @MarwanSultan
+
+# Test suites and framework configuration
+tests/ @MarwanSultan
+spec/ @MarwanSultan
+
+# Security-sensitive project configuration
+Dockerfile @MarwanSultan
+package.json @MarwanSultan
+package-lock.json @MarwanSultan
